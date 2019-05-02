@@ -33,7 +33,29 @@ public class Alg{
         x.add(quotients.get(counter - 1).multiply(x.get(counter - 1)).add(x.get(counter - 2)));
         y.add(quotients.get(counter - 1).multiply(y.get(counter - 1)).add(y.get(counter - 2)));
 
-        return new BigInteger[]{a, x.get(counter), y.get(counter)};
+        if(counter % 2 == 0){
+            return new BigInteger[]{a, x.get(counter), y.get(counter).multiply(BigInteger.valueOf(-1))};
+        } else {
+            return new BigInteger[]{a, x.get(counter).multiply(BigInteger.valueOf(-1)), y.get(counter)};
+        }
+        
+    }
+
+    public static BigInteger FastExp(BigInteger n, BigInteger power, BigInteger modulo){
+        String binary = power.toString(2);
+        BigInteger temp = n;
+        BigInteger returned = new BigInteger("1");
+
+        for(int i = binary.length()-1; i > -1; i--){
+
+            if(binary.charAt(i) == '1'){
+                returned = returned.multiply(temp);
+            }
+            
+            temp = temp.pow(2).mod(modulo);
+        }
+
+        return returned.mod(modulo);
     }
 }
 
