@@ -57,6 +57,17 @@ public class Alg{
 
         return returned.mod(modulo);
     }
+
+    public static boolean FermatTest(BigInteger a, BigInteger p){
+        BigInteger temp[] = ExtendedEuc(a, p);
+        if(!temp[0].equals(BigInteger.ONE)) 
+            return false;
+        
+        if(FastExp(a, p.subtract(BigInteger.ONE), p).equals(BigInteger.ONE))
+            return true;
+        else
+            return false;
+    }
 }
 
 //https://www.tutorialspoint.com/java/math/biginteger_divideandremainder.htm
