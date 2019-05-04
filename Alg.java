@@ -68,6 +68,31 @@ public class Alg{
         else
             return false;
     }
+
+    public static boolean MillerRabin(BigInteger a, BigInteger power){
+        int S = 0;
+        BigInteger d = power.subtract(BigInteger.valueOf(1));
+
+        while(d.mod(BigInteger.valueOf(2)).equals(BigInteger.ZERO)){
+            d = d.divide(BigInteger.valueOf(2));
+            S++;
+        }
+
+        if(FastExp(a, d, power).equals(BigInteger.valueOf(1)))
+            return true;
+        
+        int counter = 0;
+        System.out.println(S);
+        while(counter < S){
+            System.out.println(a + " " + d.multiply(BigInteger.valueOf((int) Math.pow(2, counter))) + " " + power + " = " + power.subtract(BigInteger.valueOf(1)));
+            if(FastExp(a, d.multiply(BigInteger.valueOf((int)Math.pow(2,counter))), power).equals(power.subtract(BigInteger.valueOf(1))))
+                return true;
+            counter++;
+            System.out.println(FastExp(a, d.multiply(BigInteger.valueOf(2 ^ counter)), power));
+        }
+        return false;
+    }
 }
+
 
 //https://www.tutorialspoint.com/java/math/biginteger_divideandremainder.htm
