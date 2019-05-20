@@ -1,5 +1,7 @@
 import java.math.BigInteger;
+import java.security.SecureRandom;
 import java.util.ArrayList;
+import java.util.Random;
 
 public class Alg{
 
@@ -29,9 +31,12 @@ public class Alg{
 
             counter++;
         }
+        if(counter != 1){
+            x.add(quotients.get(counter - 1).multiply(x.get(counter - 1)).add(x.get(counter - 2)));
+            y.add(quotients.get(counter - 1).multiply(y.get(counter - 1)).add(y.get(counter - 2)));
+        }
 
-        x.add(quotients.get(counter - 1).multiply(x.get(counter - 1)).add(x.get(counter - 2)));
-        y.add(quotients.get(counter - 1).multiply(y.get(counter - 1)).add(y.get(counter - 2)));
+
 
         if(counter % 2 == 0){
             return new BigInteger[]{a, x.get(counter), y.get(counter).multiply(BigInteger.valueOf(-1))};
@@ -69,30 +74,68 @@ public class Alg{
             return false;
     }
 
-    public static boolean MillerRabin(BigInteger a, BigInteger power){
+    public static boolean MillerRabin(BigInteger a, BigInteger base){
         int S = 0;
-        BigInteger d = power.subtract(BigInteger.valueOf(1));
+        BigInteger d = a.subtract(BigInteger.valueOf(1));
 
         while(d.mod(BigInteger.valueOf(2)).equals(BigInteger.ZERO)){
             d = d.divide(BigInteger.valueOf(2));
             S++;
         }
-
-        if(FastExp(a, d, power).equals(BigInteger.valueOf(1)))
+        if(FastExp(base, d, a).equals(BigInteger.valueOf(1)))
             return true;
-        
         int counter = 0;
-        System.out.println(S);
-        while(counter < S){
-            System.out.println(a + " " + d.multiply(BigInteger.valueOf((int) Math.pow(2, counter))) + " " + power + " = " + power.subtract(BigInteger.valueOf(1)));
-            if(FastExp(a, d.multiply(BigInteger.valueOf((int)Math.pow(2,counter))), power).equals(power.subtract(BigInteger.valueOf(1))))
+        while(counter < S){     
+            if(FastExp(base, d.multiply(BigInteger.valueOf((int)Math.pow(2,counter))), a).equals(a.subtract(BigInteger.valueOf(1))))
                 return true;
             counter++;
-            System.out.println(FastExp(a, d.multiply(BigInteger.valueOf(2 ^ counter)), power));
         }
         return false;
     }
+
+    private static BigInteger GenerateBigInteger(int numberOfBits){
+        SecureRandom rnd = new SecureRandom();
+        BigInteger returned = new BigInteger(numberOfBits, rnd);
+        if(returned.mod(BigInteger.valueOf(2)).equals(BigInteger.ZERO))
+            return returned.add(BigInteger.valueOf(1));
+        else
+            return returned;
+
+    }
+
+    public static BigInteger GeneratePrime(){
+
+        while(true){
+            BigInteger prime = GenerateBigInteger(512);
+            boolean isPrime = true;
+            Random rand = new Random();
+            for(int i = 0; i < 5; i++){
+                int random = rand.nextInt(100) + 2;
+                if(!MillerRabin(prime, BigInteger.valueOf(random)))
+                    isPrime = false;
+            }
+            if(isPrime)
+                return prime;
+
+        }
+    }
+
+    public static BigInteger GenerateRelativePrime(BigInteger prime){
+        while(true){
+            int temp = new Random().nextInt(1000);
+            BigInteger n = BigInteger.valueOf(temp);
+            BigInteger[] test = ExtendedEuc(prime, n);
+            if(test[0].equals(BigInteger.ONE))
+                return n;
+        }
+
+    }
+
+    public static BigInteger RSAEncrypt(BigInteger msg, BigInteger e, BigInteger n){
+        return FastExp(msg, e, n);
+    }
+
+    public static BigInteger RSADecrypt(BigInteger c, BigInteger d, BigInteger n){
+        return FastExp(c, d, n);
+    }
 }
-
-
-//https://www.tutorialspoint.com/java/math/biginteger_divideandremainder.htm
